@@ -1,0 +1,33 @@
+{
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "version": "1.0.2",
+  "name": "Linkding Dispatcher",
+  "description": "Bookmark dispatcher browser extension for linkding-dispatcher",
+  "manifest_version": 3,
+  "permissions": [
+    "bookmarks",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*/",
+    "http://*/"
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_icon": {
+      "16": "images/apple-touch-icon.png",
+      "32": "images/apple-touch-icon.png",
+      "48": "images/apple-touch-icon.png",
+      "128": "images/apple-touch-icon.png"
+    },
+    "default_title": "Bookmarks Checker",
+    "default_popup": "index.html"
+  },
+  "icons": {
+    "16": "images/apple-touch-icon.png",
+    "32": "images/apple-touch-icon.png",
+    "48": "images/apple-touch-icon.png",
+    "128": "images/apple-touch-icon.png"
+  }
+}

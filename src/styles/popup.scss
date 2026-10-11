@@ -1,0 +1,38 @@
+html,
+body {
+    width: 576px;
+    height: 390px;
+    overflow: hidden;
+    overflow-y: scroll;
+
+    border: 1px solid lightgray;
+}
+
+.tag>span {
+    line-height: 1;
+}
+
+.tags-control {
+    height: 1.25rem !important;
+}
+
+.tag-delete {
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+// .autocomplete-wrapper>.dropdown-menu {
+//     left: 3.7rem !important;
+//     right: 0;
+//     max-height: 11rem;
+//     overflow-y: auto;
+//     background: var(--bs-dropdown-bg);
+// }
+
+@media (min-width: 576px) {
+
+    .container-sm,
+    .container {
+        max-width: 574px !important;
+    }
+}

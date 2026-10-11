@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./images/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="./images/favicon.svg" sizes="any" type="image/svg+xml" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png" />
+    <link rel="mask-icon" href="./images/safari-pinned-tab.svg" color="#5856e0" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Linkding Dispatcher Settings</title>
+  </head>
+
+  <body>
+    <main class="container py-4" style="max-width: 720px">
+      <header class="mb-4">
+        <div class="d-flex align-items-center mb-2">
+          <img class="app-logo me-2" src="./images/logo.png" alt="Application logo" />
+          <span class="app-name">LINKDING</span>
+        </div>
+        <h1 class="h3 mb-1">Settings</h1>
+        <p class="text-muted mb-0">
+          Configure your Linkding Dispatcher connection and API tokens.
+        </p>
+      </header>
+
+      <form id="settings-form" class="needs-validation" novalidate autocomplete="off">
+        <div class="mb-4">
+          <label class="form-label" for="homelab-url">Homelab URL</label>
+          <input
+            id="homelab-url"
+            class="form-control"
+            type="url"
+            inputmode="url"
+            placeholder="https://linkding.example.com"
+            aria-describedby="homelab-url-help homelab-url-error"
+            required
+          />
+          <div id="homelab-url-help" class="form-text">
+            Enter the Linkding Dispatcher domain using HTTP or HTTPS.
+          </div>
+          <div id="homelab-url-error" class="invalid-feedback">
+            Enter a valid HTTP or HTTPS domain URL without a path.
+          </div>
+        </div>
+
+        <section class="mb-4" aria-labelledby="tokens-heading">
+          <h2 id="tokens-heading" class="h5">API tokens</h2>
+          <label class="form-label" for="new-token">Add a token</label>
+          <div class="input-group">
+            <input
+              id="new-token"
+              class="form-control"
+              type="password"
+              autocomplete="new-password"
+              placeholder="Paste an API token"
+            />
+            <button id="add-token" class="btn btn-outline-primary" type="button">
+              Add token
+            </button>
+          </div>
+          <div
+            id="token-error"
+            class="text-danger small mt-2"
+            role="alert"
+            aria-live="polite"
+          ></div>
+
+          <ul
+            id="token-list"
+            class="list-group mt-3"
+            aria-label="Added API tokens"
+          ></ul>
+          <p id="no-tokens" class="text-muted small mt-2 mb-0">
+            No API tokens added yet.
+          </p>
+        </section>
+
+        <div class="mb-4">
+          <label class="form-label" for="current-token">Current token</label>
+          <select
+            id="current-token"
+            class="form-select"
+            required
+            aria-describedby="current-token-help"
+          >
+            <option value="">Add a token first</option>
+          </select>
+          <div id="current-token-help" class="form-text">
+            This token will be used to authenticate popup requests.
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <button id="save-settings" class="btn btn-primary" type="submit">
+            Save settings
+          </button>
+          <span
+            id="save-status"
+            class="text-success"
+            role="status"
+            aria-live="polite"
+          ></span>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>
