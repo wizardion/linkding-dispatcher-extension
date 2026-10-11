@@ -405,7 +405,7 @@ userForm.reset.addEventListener('click', async (e) => {
   }
 });
 
-setTimeout(async () => {
+(async function () {
   const configurationNotice = document.getElementById('configuration-required');
   const configurationMessage = document.getElementById('configuration-message');
 
@@ -468,4 +468,4 @@ setTimeout(async () => {
 
     configurationNotice?.classList.remove('d-none');
   }
-}, 100);
+})();
