@@ -406,6 +406,8 @@ userForm.reset.addEventListener('click', async (e) => {
 });
 
 (async function () {
+  await nextFrame();
+
   const configurationNotice = document.getElementById('configuration-required');
   const configurationMessage = document.getElementById('configuration-message');
 
