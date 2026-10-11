@@ -19,7 +19,11 @@ import {
   setInputTags,
 } from './autocomplete/autocomplete';
 import { nextFrame } from './core';
-import { getExtensionSettings, normalizeHomelabUrl } from './core/settings';
+import {
+  getExtensionSettings,
+  normalizeHomelabUrl,
+  normalizeUrl,
+} from './core/settings';
 import { HttpClient } from './request/request';
 import { ApiError } from './request/exceptions';
 
@@ -416,10 +420,10 @@ userForm.reset.addEventListener('click', async (e) => {
     currentToken = settings.currentToken;
 
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    const url = normalizeHomelabUrl(tab.url || '');
+    const url = normalizeUrl(tab.url || '');
     // const url = 'https://www.freetobemesalon.com';
 
-    console.log('url-2');
+    console.log('url-2', [url], [tab.url]);
 
     if (url) {
       loadData(url);

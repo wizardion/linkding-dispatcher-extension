@@ -78,3 +78,20 @@ export function normalizeHomelabUrl(value: string): string | null {
     return null;
   }
 }
+
+export function normalizeUrl(value: string): string | null {
+  try {
+    const url = new URL(value.trim());
+
+    console.log('normalizeUrl', [url]);
+
+    if ((url.protocol !== 'http:' && url.protocol !== 'https:') || !url.hostname) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    console.log('normalizeUrl.error');
+    return null;
+  }
+}
