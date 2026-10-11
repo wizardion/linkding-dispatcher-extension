@@ -315,8 +315,9 @@ editForm.addEventListener('submit', async (e) => {
     try {
       await client.post<ApiJobDetails>(`${apiUrl}/bookmark/save`, payload);
 
-      editForm.classList.add('d-none');
-      info.element.classList.remove('d-none');
+      // editForm.classList.add('d-none');
+      // info.element.classList.remove('d-none');
+      window.close();
     } catch (error) {
       if (error instanceof ApiError) {
         console.log('ERROR:', [error.message]);
@@ -349,8 +350,9 @@ userForm.remove.addEventListener('click', async (e) => {
         `${apiUrl}/bookmark/${bookmark.id}`
       );
 
-      editForm.classList.add('d-none');
-      info.element.classList.remove('d-none');
+      // editForm.classList.add('d-none');
+      // info.element.classList.remove('d-none');
+      window.close();
     } catch (error) {
       if (error instanceof ApiError) {
         console.log('ERROR:', [error.message]);
