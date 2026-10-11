@@ -2,12 +2,14 @@ import './styles/main.scss';
 import {
   ExtensionSettings,
   getExtensionSettings,
+  NamedToken,
   normalizeHomelabUrl,
   saveExtensionSettings,
 } from './core/settings';
 
 const settingsForm = document.getElementById('settings-form') as HTMLFormElement;
 const homelabUrlInput = document.getElementById('homelab-url') as HTMLInputElement;
+const tokenNameInput = document.getElementById('token-name') as HTMLInputElement;
 const tokenInput = document.getElementById('new-token') as HTMLInputElement;
 const addTokenButton = document.getElementById('add-token') as HTMLButtonElement;
 const tokenList = document.getElementById('token-list') as HTMLUListElement;
@@ -19,7 +21,7 @@ const tokenError = document.getElementById('token-error') as HTMLDivElement;
 const saveStatus = document.getElementById('save-status') as HTMLSpanElement;
 const saveButton = document.getElementById('save-settings') as HTMLButtonElement;
 
-let tokens: string[] = [];
+let tokens: NamedToken[] = [];
 
 function renderTokens(selectedToken = currentTokenSelect.value): void {
   tokenList.replaceChildren();
@@ -31,21 +33,21 @@ function renderTokens(selectedToken = currentTokenSelect.value): void {
   currentTokenSelect.appendChild(emptyOption);
   currentTokenSelect.disabled = false;
 
-  tokens.forEach((token, index) => {
+  tokens.forEach(({ name, token }) => {
     const item = document.createElement('li');
     item.className =
       'list-group-item d-flex align-items-center justify-content-between gap-3';
 
     const label = document.createElement('span');
-    label.textContent = `Token ${index + 1} (${token.length > 8 ? `${token.slice(0, 4)}...${token.slice(-4)}` : '****'})`;
+    label.textContent = `${name} (${token.slice(0, 4)}...${token.slice(-4)})`;
 
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
     removeButton.className = 'btn btn-sm btn-outline-danger';
     removeButton.textContent = 'Delete';
-    removeButton.setAttribute('aria-label', `Delete token ${index + 1}`);
+    removeButton.setAttribute('aria-label', `Delete ${name}`);
     removeButton.addEventListener('click', () => {
-      tokens = tokens.filter((candidate) => candidate !== token);
+      tokens = tokens.filter((candidate) => candidate.token !== token);
 
       if (currentTokenSelect.value === token) {
         currentTokenSelect.value = '';
@@ -60,12 +62,14 @@ function renderTokens(selectedToken = currentTokenSelect.value): void {
 
     const option = document.createElement('option');
     option.value = token;
-    option.textContent = `Token ${index + 1}`;
+    option.textContent = name;
     currentTokenSelect.appendChild(option);
   });
 
   noTokensMessage.classList.toggle('d-none', tokens.length > 0);
-  currentTokenSelect.value = tokens.includes(selectedToken) ? selectedToken : '';
+  currentTokenSelect.value = tokens.some(({ token }) => token === selectedToken)
+    ? selectedToken
+    : '';
 }
 
 function validateHomelabUrl(): string | null {
@@ -83,34 +87,52 @@ currentTokenSelect.addEventListener('change', () => {
 });
 
 addTokenButton.addEventListener('click', () => {
+  const name = tokenNameInput.value.trim();
   const token = tokenInput.value.trim();
   tokenError.textContent = '';
   saveStatus.textContent = '';
 
-  if (!token) {
-    tokenError.textContent = 'Enter a token before adding it.';
+  if (!name) {
+    tokenError.textContent = 'Enter a name for this token.';
+    tokenNameInput.focus();
+    return;
+  }
+
+  if (!/^[a-fA-F0-9]{40}$/.test(token)) {
+    tokenError.textContent = 'Token must contain exactly 40 hexadecimal characters.';
     tokenInput.focus();
     return;
   }
 
-  if (tokens.includes(token)) {
+  if (tokens.some((entry) => entry.token === token)) {
     tokenError.textContent = 'This token has already been added.';
     tokenInput.focus();
     return;
   }
 
+  if (
+    tokens.some((entry) => entry.name.toLocaleLowerCase() === name.toLocaleLowerCase())
+  ) {
+    tokenError.textContent = 'A token with this name already exists.';
+    tokenNameInput.focus();
+    return;
+  }
+
   const selectedToken = currentTokenSelect.value || token;
-  tokens.push(token);
+  tokens.push({ name, token });
+  tokenNameInput.value = '';
   tokenInput.value = '';
   renderTokens(selectedToken);
 });
 
-tokenInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    addTokenButton.click();
-  }
-});
+for (const input of [tokenNameInput, tokenInput]) {
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      addTokenButton.click();
+    }
+  });
+}
 
 settingsForm.addEventListener('submit', async (event) => {
   event.preventDefault();

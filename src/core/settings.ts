@@ -1,6 +1,11 @@
+export interface NamedToken {
+  name: string;
+  token: string;
+}
+
 export interface ExtensionSettings {
   homelabUrl: string;
-  tokens: string[];
+  tokens: NamedToken[];
   currentToken: string;
 }
 
@@ -14,12 +19,30 @@ export async function getExtensionSettings(): Promise<ExtensionSettings> {
     return { homelabUrl: '', tokens: [], currentToken: '' };
   }
 
-  const settings = value as Partial<ExtensionSettings>;
+  const settings = value as Partial<ExtensionSettings> & {
+    tokens?: unknown[];
+  };
   const tokens = Array.isArray(settings.tokens)
-    ? settings.tokens.filter((token): token is string => typeof token === 'string')
+    ? settings.tokens.reduce<NamedToken[]>((savedTokens, entry, index) => {
+        if (typeof entry === 'string') {
+          savedTokens.push({ name: `Token ${index + 1}`, token: entry });
+        } else if (
+          entry &&
+          typeof entry === 'object' &&
+          'name' in entry &&
+          'token' in entry &&
+          typeof entry.name === 'string' &&
+          typeof entry.token === 'string'
+        ) {
+          savedTokens.push({ name: entry.name, token: entry.token });
+        }
+
+        return savedTokens;
+      }, [])
     : [];
   const currentToken =
-    typeof settings.currentToken === 'string' && tokens.includes(settings.currentToken)
+    typeof settings.currentToken === 'string' &&
+    tokens.some(({ token }) => token === settings.currentToken)
       ? settings.currentToken
       : '';
 

@@ -46,18 +46,36 @@
 
         <section class="mb-4" aria-labelledby="tokens-heading">
           <h2 id="tokens-heading" class="h5">API tokens</h2>
-          <label class="form-label" for="new-token">Add a token</label>
+          <div class="mb-3">
+            <label class="form-label" for="token-name">Token name</label>
+            <input
+              id="token-name"
+              class="form-control"
+              type="text"
+              maxlength="64"
+              autocomplete="off"
+              placeholder="e.g. Home server"
+            />
+          </div>
+          <label class="form-label" for="new-token">Token value</label>
           <div class="input-group">
             <input
               id="new-token"
               class="form-control"
               type="password"
               autocomplete="new-password"
-              placeholder="Paste an API token"
+              placeholder="40-character hexadecimal API token"
+              pattern="[a-fA-F0-9]{40}"
+              minlength="40"
+              maxlength="40"
+              aria-describedby="token-format-help"
             />
             <button id="add-token" class="btn btn-outline-primary" type="button">
               Add token
             </button>
+          </div>
+          <div id="token-format-help" class="form-text">
+            Enter a 40-character hexadecimal token.
           </div>
           <div
             id="token-error"
