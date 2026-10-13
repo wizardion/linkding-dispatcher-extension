@@ -18,7 +18,7 @@ import {
   registerTags,
   setInputTags,
 } from './autocomplete/autocomplete';
-import { nextFrame } from './core';
+import { nextFrame, wait } from './core';
 import {
   getExtensionSettings,
   normalizeHomelabUrl,
@@ -265,6 +265,20 @@ function toggleTagsSet(archived: boolean) {
   }
 }
 
+function navigateToHomeLab(isBlank: boolean, homelabUrl: string) {
+  const options = {
+    url: homelabUrl,
+    active: true,
+  };
+
+  if (!isBlank) {
+    chrome.tabs.update(options);
+    window.close();
+  } else {
+    chrome.tabs.create(options);
+  }
+}
+
 userForm.url.addEventListener('change', (e: Event) => {
   const input = e.target as HTMLInputElement;
 
@@ -317,6 +331,7 @@ editForm.addEventListener('submit', async (e) => {
 
       // editForm.classList.add('d-none');
       // info.element.classList.remove('d-none');
+      // await wait(150);
       window.close();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -350,8 +365,6 @@ userForm.remove.addEventListener('click', async (e) => {
         `${apiUrl}/bookmark/${bookmark.id}`
       );
 
-      // editForm.classList.add('d-none');
-      // info.element.classList.remove('d-none');
       window.close();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -412,6 +425,7 @@ userForm.reset.addEventListener('click', async (e) => {
   try {
     const settings = await getExtensionSettings();
     const homelabUrl = normalizeHomelabUrl(settings.homelabUrl);
+    const logoUrl = document.getElementById('logo-url') as HTMLLinkElement;
 
     if (!homelabUrl || !settings.currentToken) {
       configurationNotice?.classList.remove('d-none');
@@ -423,9 +437,9 @@ userForm.reset.addEventListener('click', async (e) => {
 
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     const url = normalizeUrl(tab.url || '');
-    // const url = 'https://www.freetobemesalon.com';
 
-    console.log('url-2', [url], [tab.url]);
+    logoUrl.href = homelabUrl;
+    logoUrl.addEventListener('click', () => navigateToHomeLab(!!url, homelabUrl));
 
     if (url) {
       loadData(url);
