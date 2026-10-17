@@ -1,0 +1,10 @@
+$primary: #4644d5;
+$danger: #d4342c;
+$success: #2ecc71;
+
+$focus-ring-width: 3px;
+$focus-ring-opacity: .25;
+$focus-ring-color: rgba($primary, $focus-ring-opacity);
+$focus-ring-box-shadow: none;
+
+@import "bootstrap/scss/bootstrap";

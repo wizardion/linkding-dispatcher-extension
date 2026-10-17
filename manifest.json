@@ -4,10 +4,14 @@
 	"name": "Linkding Dispatcher",
 	"description": "Bookmark dispatcher browser extension for linkding-dispatcher",
 	"manifest_version": 3,
+	"background": {
+		"service_worker": "background.js"
+	},
 	"permissions": [
 		"bookmarks",
 		"storage",
-		"activeTab"
+		"activeTab",
+		"offscreen"
 	],
 	"host_permissions": [
 		"https://*/",

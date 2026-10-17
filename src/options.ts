@@ -1,3 +1,4 @@
+import './styles/bootstrap.scss';
 import './styles/main.scss';
 import {
   ExtensionSettings,

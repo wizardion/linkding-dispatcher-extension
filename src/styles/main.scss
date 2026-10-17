@@ -1,15 +1,6 @@
-// 2. Override specific theme color variables
-$primary: #4644d5;
 $danger: #d4342c;
-$success: #2ecc71;
 
-$focus-ring-width: 3px;
-$focus-ring-opacity: .25;
-$focus-ring-color: rgba($primary, $focus-ring-opacity);
-// $focus-ring-box-shadow: 0 0 0 $focus-ring-width $focus-ring-color;
-$focus-ring-box-shadow: none;
-
-@import "bootstrap/scss/bootstrap";
+@import "bootstrap/scss/functions";
 
 .form-check-danger {
     .form-check-input:checked {

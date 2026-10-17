@@ -11,7 +11,9 @@ const __root__ = resolve(__dirname);
 module.exports = {
   entry: {
     index: './src/index.ts',
+    background: './src/background.ts',
     options: './src/options.ts',
+    offscreen: './src/offscreen.ts',
   },
   output: {
     filename: 'js/[name].[contenthash].js', // 👈 Solves Safari JS caching
@@ -21,6 +23,48 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        // 1. Extract the separately compiled Bootstrap stylesheet
+        vendorStyles: {
+          name: 'vendors',
+          test: /[\\/]bootstrap\.scss$/,
+          type: 'css/mini-extract',
+          chunks: 'all',
+          enforce: true,
+        },
+        // 2. Grab all application CSS and put it in 'local'
+        localStyles: {
+          name: 'local',
+          test: /^(?!.*[\\/]bootstrap\.scss$).*\.scss$/,
+          type: 'css/mini-extract',
+          chunks: 'all',
+          enforce: true,
+        },
+      },
+    },
+  },
+  // optimization: {
+  //   splitChunks: {
+  //     cacheGroups: {
+  //       // Group all third-party styles (e.g., from node_modules) into vendors
+  //       vendorStyles: {
+  //         name: 'vendors',
+  //         test: /[\\/]node_modules[\\/].*\.s?css$/,
+  //         chunks: 'all',
+  //         enforce: true,
+  //       },
+  //       // Group your local application styles
+  //       localStyles: {
+  //         name: 'main',
+  //         test: /[\\/]src[\\/].*\.s?css$/,
+  //         chunks: 'all',
+  //         enforce: true,
+  //       },
+  //     },
+  //   },
+  // },
   module: {
     rules: [
       {
@@ -54,22 +98,30 @@ module.exports = {
         },
         exclude: /node_modules/,
       },
+      // {
+      //   test: /\.(sa|sc|c)ss$/,
+      //   use: [
+      //     isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
+      //     'css-loader', // 2. Translates CSS into CommonJS
+      //     // 'sass-loader', // 1. Compiles Sass to CSS
+      //     {
+      //       loader: 'sass-loader',
+      //       options: {
+      //         sassOptions: {
+      //           quietDeps: true,
+      //           silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
+      //           includePaths: [resolve(__dirname, 'node_modules')],
+      //         },
+      //       },
+      //     },
+      //   ],
+      // },
       {
-        test: /\.(sa|sc|c)ss$/,
+        test: /\.s[ac]ss$/i,
         use: [
-          isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
-          'css-loader', // 2. Translates CSS into CommonJS
-          // 'sass-loader', // 1. Compiles Sass to CSS
-          {
-            loader: 'sass-loader',
-            options: {
-              sassOptions: {
-                quietDeps: true,
-                silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
-                includePaths: [resolve(__dirname, 'node_modules')],
-              },
-            },
-          },
+          MiniCssExtractPlugin.loader, // Extracts CSS into separate files
+          'css-loader', // Turns CSS into commonjs
+          'sass-loader', // Compiles Sass to CSS
         ],
       },
       {
@@ -90,7 +142,7 @@ module.exports = {
       filename: 'index.html',
       inject: 'body',
       publicPath: './',
-      chunks: ['index'],
+      chunks: ['vendors', 'local', 'index', 'background'],
     }),
     new HtmlWebpackPlugin({
       minify: isDevelopment ? false : true,
@@ -98,19 +150,33 @@ module.exports = {
       filename: 'options.html',
       inject: 'body',
       publicPath: './',
-      chunks: ['options'],
+      chunks: ['vendors', 'local', 'options'],
+    }),
+    new HtmlWebpackPlugin({
+      minify: isDevelopment ? false : true,
+      template: './src/offscreen.html',
+      filename: 'offscreen.html',
+      inject: 'head',
+      publicPath: './',
+      chunks: ['offscreen'],
     }),
     new StatsWriterPlugin({
       filename: 'manifest.json',
       stats: {
         all: false,
-        hash: true, // Includes the main build hash
+        // hash: true, // Includes the main build hash
+        entrypoints: true,
+        assets: false, // Optional: keeps the output cleaner
       },
-      transform({ hash }) {
+      transform({ entrypoints }) {
+        const backgroundAssets = entrypoints.background?.assets || [];
+        const background = backgroundAssets.find((asset) => asset.name.endsWith('.js'));
+
         const manifest = merge(
           JSON.parse(fs.readFileSync(resolve(__root__, 'manifest.json'))),
           // { action: { default_popup: `index.${hash}.html` } }
-          { action: { default_popup: `index.html` } }
+          { action: { default_popup: `index.html` } },
+          { background: { service_worker: background.name } }
         );
 
         return JSON.stringify(manifest, null, 2);

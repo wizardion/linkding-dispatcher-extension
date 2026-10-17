@@ -1,3 +1,4 @@
+import './styles/bootstrap.scss';
 import './styles/autocomplete.scss';
 import './styles/main.scss';
 import './styles/popup.scss';
@@ -11,6 +12,7 @@ import {
   Payload,
   ApiMetadataData,
   ApiResetDetails,
+  AssembledData,
 } from './types/types';
 import {
   getSelectedTags,
@@ -418,7 +420,7 @@ userForm.reset.addEventListener('click', async (e) => {
   }
 });
 
-(async function () {
+async function init() {
   const configurationNotice = document.getElementById('configuration-required');
   const configurationMessage = document.getElementById('configuration-message');
 
@@ -482,4 +484,34 @@ userForm.reset.addEventListener('click', async (e) => {
 
     configurationNotice?.classList.remove('d-none');
   }
-})();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // const contentDiv = document.getElementById('content');
+
+  init();
+
+  try {
+    // 1. Instantly ping the offscreen vault (Zero disk I/O, purely in-memory message)
+    const data = await chrome.runtime.sendMessage<{ type: string }, AssembledData>({
+      type: 'GET_PRE_ASSEMBLED_DATA',
+    });
+
+    if (data) {
+      // 2. Inject your pre-assembled elements straight into the DOM
+      const html = `
+        <p>Welcome back, <b>${data.user}</b></p>
+        <ul>
+          ${data.notifications.map((n) => `<li>${n}</li>`).join('')}
+        </ul>
+        <small>Cache sync time: ${data.lastUpdated}</small>
+      `;
+
+      // contentDiv.innerHTML = html;
+      console.log(html);
+    }
+  } catch (error) {
+    // contentDiv.innerText = 'Error loading smooth cache state.';
+    console.error(error);
+  }
+});

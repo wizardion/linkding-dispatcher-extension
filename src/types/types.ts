@@ -145,6 +145,12 @@ export interface MatchesResult {
   isNew: boolean;
 }
 
+export interface AssembledData {
+  user: string;
+  notifications: string[];
+  lastUpdated: string;
+}
+
 // Declare the global window variable you were using
 declare global {
   interface Window {
