@@ -131,7 +131,7 @@ function searchInQuery(query: string): MatchesResult {
 // ------------------------------------------------------------------------------------
 function showSuggestion(e: Event) {
   const input = e.target as HTMLInputElement;
-  const { isNew, matches } = searchInQuery(input.value.trim());
+  const { isNew, matches } = searchInQuery(input.value.trim().toLowerCase());
 
   listElement.innerHTML = '';
   listElement.scrollTop = 0;
